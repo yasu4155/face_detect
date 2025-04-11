@@ -1,0 +1,7 @@
+mediapipe==0.10.21
+opencv-contrib-python==4.10.0.84
+opencv-python==4.10.0.84
+pillow==10.4.0
+protobuf==4.25.3
+streamlit==1.40.0
+pip==25.0.1
