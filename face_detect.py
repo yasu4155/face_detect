@@ -1,4 +1,5 @@
 import streamlit as st
+from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -11,7 +12,13 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
 def main():
-    TARGET_IMG = './sample2.jpg'
+    fupload = st.sidebar.file_uploader('Upload image file')
+    if fupload is None:
+        st.write('Please upload an image file.')
+        return
+    cv2.imwrite('./sample.jpg', cv2.cvtColor(np.array(Image.open(fupload.name)), cv2.COLOR_BGR2RGB))
+
+    TARGET_IMG = './sample.jpg'
     img = cv2.imread(TARGET_IMG)
     st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 
@@ -46,6 +53,7 @@ def main():
 
     coordinates_tuple = np.array(tuple(landmark_pixel_coordinates))
     img = cv2.imread(TARGET_IMG)
+
     for idx, coordinates in enumerate(coordinates_tuple):
         cv2.circle(img, coordinates, 1, (255, 255, 0), 1)
 
