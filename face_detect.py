@@ -2,8 +2,7 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-import cv2
-import math
+import cv2, math, os
 import mediapipe as mp
 import mediapipe.python.solutions.drawing_styles
 from mediapipe.tasks import python
@@ -16,9 +15,9 @@ def main():
     if fupload is None:
         st.write('Please upload an image file.')
         return
-    cv2.imwrite('./sample.jpg', cv2.cvtColor(np.array(Image.open(fupload.name)), cv2.COLOR_BGR2RGB))
+    cv2.imwrite('./target.jpg', cv2.cvtColor(np.array(Image.open(fupload.name)), cv2.COLOR_BGR2RGB))
 
-    TARGET_IMG = './sample.jpg'
+    TARGET_IMG = './target.jpg'
     img = cv2.imread(TARGET_IMG)
     st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 
@@ -35,9 +34,6 @@ def main():
 
 #   STEP 5: 検出した部位がわかるようにマーカーを描く
     annotated_image = draw_landmarks_on_image(image.numpy_view(), detection_result)
-    # cv2.imshow('image', cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
-    # cv2.waitKey(0) 
-    # cv2.destroyAllWindows()
     st.image(annotated_image)
 
     img_height, img_width, _= img.shape
@@ -57,10 +53,8 @@ def main():
     for idx, coordinates in enumerate(coordinates_tuple):
         cv2.circle(img, coordinates, 1, (255, 255, 0), 1)
 
-    # cv2.imshow('image', img)
-    # cv2.waitKey(0) 
-    # cv2.destroyAllWindows()
     st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    os.remove('./target.jpg')
     return
 
 def draw_landmarks_on_image(rgb_image, detection_result):
@@ -86,28 +80,6 @@ def draw_landmarks_on_image(rgb_image, detection_result):
           .get_default_face_mesh_contours_style())
 
     return annotated_image
-
-
-def plot_face_blendshapes_bar_graph(face_blendshapes):
-  # Extract the face blendshapes category names and scores.
-    face_blendshapes_names = [face_blendshapes_category.category_name for face_blendshapes_category in face_blendshapes]
-    face_blendshapes_scores = [face_blendshapes_category.score for face_blendshapes_category in face_blendshapes]
-  # The blendshapes are ordered in decreasing score value.
-    face_blendshapes_ranks = range(len(face_blendshapes_names))
-
-    fig, ax = plt.subplots(figsize=(12, 12))
-    bar = ax.barh(face_blendshapes_ranks, face_blendshapes_scores, label=[str(x) for x in face_blendshapes_ranks])
-    ax.set_yticks(face_blendshapes_ranks, face_blendshapes_names)
-    ax.invert_yaxis()
-
-  # Label each bar with values
-    for score, patch in zip(face_blendshapes_scores, bar.patches):
-      plt.text(patch.get_x() + patch.get_width(), patch.get_y(), f"{score:.4f}", va="top")
-
-    ax.set_xlabel('Score')
-    ax.set_title("Face Blendshapes")
-    plt.tight_layout()
-    plt.show()
 
 
 if __name__ == '__main__':
